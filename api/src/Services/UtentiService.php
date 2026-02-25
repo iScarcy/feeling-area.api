@@ -5,10 +5,15 @@ namespace Api\Services;
 
 use Api\Dto\Utente;
 use Api\Repositories\UtentiRepository;
+ use Firebase\JWT\JWT;
 
 final class UtentiService
 {
-    public function __construct(private UtentiRepository $repo) {}
+    public function __construct(private UtentiRepository $repo,
+        private string $jwtSecret,
+        private string $jwtIssuer,
+        private int $jwtTtl
+    ) {}
 
     /** @return Utente[] */
     public function list(): array
@@ -79,21 +84,34 @@ final class UtentiService
         return $this->create($input);
     }
 
-    public function login(string $email, string $password): array
-    {
-        $u = $this->repo->findByEmail($email);
-        if (!$u || !password_verify($password, $u->Password)) {
-            throw new \RuntimeException('Credenziali non valide');
-        }
+  
 
-        // Fittizio: ritorniamo un token fake (poi lo sostituisci con JWT vero)
-        $fakeToken = base64_encode('fake-token-for-user-' . $u->ID);
+public function login(string $email, string $password): array
+{
+    $u = $this->repo->findByEmail($email);
 
-        return [
-            'token' => $fakeToken,
-            'utente' => $u, // jsonSerialize nasconde password
-        ];
+    if (!$u || !password_verify($password, $u->Password)) {
+        throw new \RuntimeException('Credenziali non valide');
     }
+
+    $now = time();
+
+    $payload = [
+        'iss' => $this->jwtIssuer,
+        'iat' => $now,
+        'exp' => $now + $this->jwtTtl,
+        'sub' => $u->ID,
+        'email' => $u->Email,
+        'isAdmin' => $u->IsAdmin,
+    ];
+
+    $jwt = \Firebase\JWT\JWT::encode($payload, $this->jwtSecret, 'HS256');
+
+    return [
+        'token' => $jwt,
+        'utente' => $u,
+    ];
+}
 
     public function recoverPassword(string $email): array
     {

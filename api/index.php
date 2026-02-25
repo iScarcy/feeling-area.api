@@ -5,8 +5,15 @@ use DI\ContainerBuilder;
 use Slim\Factory\AppFactory;
 use Api\Controllers\ServiziController;
 use Api\Controllers\UtentiController;
+use Api\Middleware\JwtMiddleware;
+use Dotenv\Dotenv;
 
 require __DIR__ . '/vendor/autoload.php';
+
+// Load environment variables
+// Carica .env
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 // Build container
 $builder = new ContainerBuilder();
@@ -14,6 +21,8 @@ $builder->addDefinitions(__DIR__ . '/config/container.php');
 $container = $builder->build();
 
 AppFactory::setContainer($container);
+
+$jwtMiddleware = $container->get(JwtMiddleware::class);
 
 $app = AppFactory::create();
 $app->setBasePath('/api');
@@ -26,14 +35,16 @@ $app->addErrorMiddleware(false, false, false);
 // Servizi
 $app->get('/servizi', [ServiziController::class, 'getAll']);
 
-// CRUD Utenti
-$app->get('/utenti', [UtentiController::class, 'list']);
-$app->get('/utenti/{id}', [UtentiController::class, 'get']);
-$app->post('/utenti', [UtentiController::class, 'create']);
-$app->put('/utenti/{id}', [UtentiController::class, 'update']);
-$app->delete('/utenti/{id}', [UtentiController::class, 'delete']);
+// CRUD protetto
+$app->group('/utenti', function ($group) {
+    $group->get('', [UtentiController::class, 'list']);
+    $group->get('/{id}', [UtentiController::class, 'get']);
+    $group->post('', [UtentiController::class, 'create']);
+    $group->put('/{id}', [UtentiController::class, 'update']);
+    $group->delete('/{id}', [UtentiController::class, 'delete']);
+})->add($jwtMiddleware);
 
-// Auth
+// Auth NON protetto
 $app->post('/auth/register', [UtentiController::class, 'register']);
 $app->post('/auth/login', [UtentiController::class, 'login']);
 $app->post('/auth/recover-password', [UtentiController::class, 'recoverPassword']);

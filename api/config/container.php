@@ -7,9 +7,14 @@ use Api\Repositories\ServiziRepository;
 use Api\Controllers\UtentiController;
 use Api\Services\UtentiService;
 use Api\Repositories\UtentiRepository;
-
+use Api\Middleware\JwtMiddleware;
 
 return [
+      //JWT
+     'jwt.secret' => $_ENV['JWT_SECRET'],
+     'jwt.issuer' => $_ENV['JWT_ISSUER'],
+     'jwt.ttl' => (int)$_ENV['JWT_TTL'],
+
     // Repository
     ServiziRepository::class => DI\create(ServiziRepository::class),
 
@@ -21,9 +26,19 @@ return [
     ServiziController::class => DI\create(ServiziController::class)
         ->constructor(DI\get(ServiziService::class)),
 
-    UtentiRepository::class => DI\create(UtentiRepository::class),
+     UtentiRepository::class => DI\create(UtentiRepository::class),
+
     UtentiService::class => DI\create(UtentiService::class)
-        ->constructor(DI\get(UtentiRepository::class)),
+        ->constructor(
+            DI\get(UtentiRepository::class),
+            DI\get('jwt.secret'),
+            DI\get('jwt.issuer'),
+            DI\get('jwt.ttl')
+        ),
+
     UtentiController::class => DI\create(UtentiController::class)
-        ->constructor(DI\get(UtentiService::class)),    
+        ->constructor(DI\get(UtentiService::class)),
+
+    JwtMiddleware::class => DI\create(JwtMiddleware::class)
+        ->constructor(DI\get('jwt.secret')), 
 ];
