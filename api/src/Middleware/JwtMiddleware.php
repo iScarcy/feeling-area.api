@@ -9,13 +9,16 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Response;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
+use Firebase\JWT\BeforeValidException;
 
 final class JwtMiddleware
 {
     public function __construct(private string $secret) {}
 
     public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
+    { 
         $authHeader = $request->getHeaderLine('Authorization');
 
         if (!preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
@@ -24,17 +27,17 @@ final class JwtMiddleware
 
         $token = $matches[1];
 
-        try {
-           $decoded = \Firebase\JWT\JWT::decode($token, new \Firebase\JWT\Key($this->secret, 'HS256'));
+       try {
 
-            // Salviamo utente nel request
-            $request = $request->withAttribute('user', $decoded);
+                $decoded = JWT::decode($token, new Key($this->secret, 'HS256'));
 
-            return $handler->handle($request);
+                $request = $request->withAttribute('user', $decoded);
 
-        } catch (\Throwable $e) {
-            return $this->unauthorized();
-        }
+            } catch (\Exception $e) {
+                return $this->unauthorized();
+            }
+
+        return $handler->handle($request);
     }
 
     private function unauthorized(): ResponseInterface

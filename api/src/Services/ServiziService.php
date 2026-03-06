@@ -13,4 +13,19 @@ final class ServiziService
     {
         return $this->repository->getAll();
     }
+
+    public function getById(int $id): ?array
+    {
+        return $this->repository->getById($id);
+    }
+
+    public function create(array $servizio): array
+    {
+        return $this->repository->create($servizio);
+    }   
+
+    public function update(int $id, array $servizio): ?array
+    {
+        return $this->repository->update($id, $servizio);
+    }
 }
