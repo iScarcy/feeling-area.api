@@ -1,3 +1,6 @@
 api/vendor/
 .env
 .DS_Store
+api/src/Repositories/sql/
+api/createAdmin.php
+.vscode/launch.json

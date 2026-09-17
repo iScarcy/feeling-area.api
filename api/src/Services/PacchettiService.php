@@ -14,6 +14,7 @@ final class PacchettiService
         return $this->repository->getAll();
     }
 
+    /*
     public function getById(int $id): ?array
     {
         return $this->repository->getById($id);
@@ -29,5 +30,5 @@ final class PacchettiService
         return $this->repository->removeServizio($pacchettoId, $servizioId);
     }
 
-    
+    */
 }

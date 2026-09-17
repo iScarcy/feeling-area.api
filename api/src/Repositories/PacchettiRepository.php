@@ -3,26 +3,26 @@ declare(strict_types=1);
 
 namespace Api\Repositories;
 
+use PDO;
+
 final class PacchettiRepository
 {
-    // Per ora dati fittizi, in futuro connettiti al database
-    public array $pacchetti = [
-
-        [
-            'ID' => 1,
-            'Nome' => 'Pacchetto Base',
-            'DataCreazione' => null,
-            'DataCancellazione' => null,
-            'Costo' => 99.99,
-            'Servizi' => [1] // ID dei servizi inclusi
-        ],
-    ];
+    
+ public function __construct(private PDO $db) {}
 
     public function getAll(): array
     {
-         return $this->pacchetti;
-    }
+        $stmt = $this->db->query(
+            
+            "SELECT p.idPacchetto, p.Pacchetto, p.Costo, GROUP_CONCAT(ps.idServizio) AS serviziInclusiIds
+             FROM Pacchetti p
+             LEFT JOIN Pacchetti_Servizi ps ON p.idPacchetto = ps.idPacchetto
+             GROUP BY p.idPacchetto, p.Pacchetto, p.Costo"
+        );
 
+        return $stmt->fetchAll();
+    }
+    /*
     public function getById(int $id): ?array
     {
         foreach ($this->pacchetti as $pacchetto) {
@@ -60,6 +60,6 @@ final class PacchettiRepository
         }
         return null; // Pacchetto non trovato
     }
-
+    */
    
 }

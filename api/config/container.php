@@ -9,6 +9,14 @@ use Api\Controllers\UtentiController;
 use Api\Services\UtentiService;
 use Api\Repositories\UtentiRepository;
 
+use Api\Controllers\QuestionariController;
+use Api\Services\QuestionariService;  
+use Api\Repositories\QuestionariRepository;
+
+use Api\Controllers\AdminController;
+use Api\Services\AdminService;
+use Api\Repositories\AdminRepository;
+
 use Api\Middleware\JwtMiddleware;
 
 use PDO;
@@ -50,6 +58,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | QUESTIONARI
+    |--------------------------------------------------------------------------
+    */
+    QuestionariRepository::class => DI\create()
+        ->constructor(DI\get(PDO::class)),
+     
+    QuestionariService::class => DI\create()
+        ->constructor(DI\get(QuestionariRepository::class)),
+        
+    QuestionariController::class => DI\create()
+        ->constructor(DI\get(QuestionariService::class)),    
+
+    /*
+    |--------------------------------------------------------------------------
     | SERVIZI
     |--------------------------------------------------------------------------
     */
@@ -62,18 +84,19 @@ return [
 
     ServiziController::class => DI\create()
         ->constructor(DI\get(ServiziService::class)),
-
+    
     /*
     |--------------------------------------------------------------------------
     | UTENTI
     |--------------------------------------------------------------------------
     */
 
-    UtentiRepository::class => DI\create(),
+    UtentiRepository::class => DI\create()
+         ->constructor(DI\get(PDO::class)),
 
     UtentiService::class => DI\create()
         ->constructor(
-            DI\get(UtentiRepository::class),
+            DI\get(UtentiRepository::class), DI\get(QuestionariService::class),
             DI\get('jwt.secret'),
             DI\get('jwt.issuer'),
             DI\get('jwt.ttl')
@@ -81,6 +104,26 @@ return [
 
     UtentiController::class => DI\create()
         ->constructor(DI\get(UtentiService::class)),
+
+     /*
+    |--------------------------------------------------------------------------
+    | ADMIN
+    |--------------------------------------------------------------------------
+    */
+
+    AdminRepository::class => DI\create()
+         ->constructor(DI\get(PDO::class)),
+
+    AdminService::class => DI\create()
+        ->constructor(
+            DI\get(AdminRepository::class),
+            DI\get('jwt.secret'),
+            DI\get('jwt.issuer'),
+            DI\get('jwt.ttl')
+        ),
+
+    AdminController::class => DI\create()
+        ->constructor(DI\get(AdminService::class)),
 
     /*
     |--------------------------------------------------------------------------

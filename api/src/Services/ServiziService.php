@@ -14,11 +14,11 @@ final class ServiziService
         return $this->repository->getAll();
     }
 
-    public function getById(int $id): ?array
+    public function getByIdPacchetto(int $idPacchetto): ?array
     {
-        return $this->repository->getById($id);
+        return $this->repository->getByIdPacchetto($idPacchetto);
     }
-
+    /*
     public function create(array $servizio): array
     {
         return $this->repository->create($servizio);
@@ -28,4 +28,5 @@ final class ServiziService
     {
         return $this->repository->update($id, $servizio);
     }
+        */
 }

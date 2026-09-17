@@ -4,105 +4,127 @@ declare(strict_types=1);
 namespace Api\Repositories;
 
 use Api\Dto\Utente;
-
-final class UtentiRepository
+use PDO;
+class UtentiRepository
 {
-    /**
-     * Finto storage in-memory.
-     * In produzione verrà sostituito con DB.
-     */
-    private static array $utenti = [];
-    private static int $nextId = 1;
+    public function __construct(private PDO $pdo) {}
 
-    public function __construct()
+    public function getPacchettiServiziByUtenteId(int $utenteId): array
     {
-        // Seed solo la prima volta
-        if (empty(self::$utenti)) {
-            $this->seed();
-        }
+        $stmt = $this->pdo->prepare("
+            SELECT	
+                s.idServizio, s.servizio, p.Pacchetto   
+            FROM
+                Pacchetti_Utenti pu
+            JOIN 
+                Pacchetti p on pu.idPacchetto = p.idPacchetto
+            JOIN
+                Pacchetti_Servizi ps on ps.idPacchetto = p.idPacchetto
+            JOIN 
+                Servizi s on ps.idServizio = s.idServizio
+            WHERE
+                pu.idUtente = :idUtente
+                and
+                pu.DataScadenza is null or pu.DataScadenza >= NOW();  
+        ");
+
+        $stmt->execute(['idUtente' => $utenteId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
-    /** @return Utente[] */
-    public function getAll(): array
+    
+    public function getQuestionariByUtenteId(int $utenteId): array
     {
-        return array_values(self::$utenti);
-    }
+        $stmt = $this->pdo->prepare("
+            SELECT	
+               q.idQuest, q.Nome, q.Domande_Max
+            FROM
+                Pacchetti_Utenti pu
+            JOIN 
+                Pacchetti p on pu.idPacchetto = p.idPacchetto
+            JOIN
+                Pacchetti_Servizi ps on ps.idPacchetto = p.idPacchetto
+            JOIN 
+                Servizi s on ps.idServizio = s.idServizio
+            JOIN
+                Questionari q on q.idServizio = s.idServizio    
+            WHERE
+                pu.idUtente = :idUtente
+                and
+                pu.DataScadenza is null or pu.DataScadenza >= NOW();  
+        ");
 
-    public function findById(int $id): ?Utente
-    {
-        return self::$utenti[$id] ?? null;
+        $stmt->execute(['idUtente' => $utenteId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function findByEmail(string $email): ?Utente
     {
-        foreach (self::$utenti as $u) {
-            if (mb_strtolower($u->Email) === mb_strtolower($email)) return $u;
+        $stmt = $this->pdo->prepare("
+            SELECT * FROM Utenti WHERE email = :email LIMIT 1
+        ");
+
+        $stmt->execute(['email' => $email]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return null;
         }
-        return null;
+
+        return $this->mapRowToDto($row);
     }
 
     public function create(Utente $utente): Utente
     {
-        $id = self::$nextId++;
-        $created = new Utente(
+        $stmt = $this->pdo->prepare("
+            INSERT INTO Utenti
+            (nome,cognome,email,password,data_nascita,luogo_nascita,sesso,cellulare)
+            VALUES
+            (:nome,:cognome,:email,:password,:data_nascita,:luogo_nascita,:sesso,:cellulare)
+        ");
+
+        $stmt->execute([
+            'nome' => $utente->Nome,
+            'cognome' => $utente->Cognome,
+            'email' => $utente->Email,
+            'password' => $utente->Password,
+            'data_nascita' => $utente->DataNascita,
+            'luogo_nascita' => $utente->LuogoNascita,
+            'sesso' => $utente->Sesso,
+            'cellulare' => $utente->Cellulare
+        ]);
+
+        $id = (int)$this->pdo->lastInsertId();
+
+        return new Utente(
             $id,
             $utente->Nome,
             $utente->Cognome,
             $utente->Email,
             $utente->Password,
-            $utente->Cell,
-            $utente->IsAdmin
+            $utente->DataNascita,
+            $utente->LuogoNascita,
+            $utente->Sesso,
+            $utente->Cellulare
         );
-        self::$utenti[$id] = $created;
-        return $created;
     }
 
-    public function update(int $id, Utente $utente): ?Utente
+    private function mapRowToDto(array $row): Utente
     {
-        if (!isset(self::$utenti[$id])) return null;
-
-        $updated = new Utente(
-            $id,
-            $utente->Nome,
-            $utente->Cognome,
-            $utente->Email,
-            $utente->Password,
-            $utente->Cell,
-            $utente->IsAdmin
+        return new Utente(
+            (int)$row['id'],
+            $row['nome'],
+            $row['cognome'],
+            $row['email'],
+            $row['password'],
+            $row['data_nascita'],
+            $row['luogo_nascita'],
+            $row['sesso'],
+            $row['cellulare']
         );
-        self::$utenti[$id] = $updated;
-        return $updated;
-    }
-
-    public function delete(int $id): bool
-    {
-        if (!isset(self::$utenti[$id])) return false;
-        unset(self::$utenti[$id]);
-        return true;
-    }
-
-    private function seed(): void
-    {
-        $admin = new Utente(
-            0,
-            'Admin',
-            'User',
-            'admin@example.com',
-            password_hash('Admin123!', PASSWORD_DEFAULT),
-            '0000000000',
-            true
-        );
-        $this->create($admin);
-
-        $user = new Utente(
-            0,
-            'Mario',
-            'Rossi',
-            'mario.rossi@example.com',
-            password_hash('Password123!', PASSWORD_DEFAULT),
-            '3331234567',
-            false
-        );
-        $this->create($user);
     }
 }
+
+ 

@@ -13,23 +13,25 @@ final class ServiziRepository
     public function getAll(): array
     {
         $stmt = $this->db->query(
-            "SELECT idServizio, Servizio FROM Servizi ORDER BY Servizio"
+            "SELECT idServizio, servizio FROM Servizi ORDER BY servizio"
         );
 
         return $stmt->fetchAll();
     }
 
-    /*
-    public function getById(int $id): ?array
+    
+    public function getByIdPacchetto(int $idPacchetto): ?array
     {
-        foreach ($this->servizi as $servizio) {
-            if ($servizio['idServizio'] === $id) {
-                return $servizio;
-            }
-        }
-        return null; // Servizio non trovato
+       $stmp = $this->db->prepare(
+            "SELECT s.idServizio, s.servizio 
+             FROM Servizi s
+             JOIN Pacchetti_Servizi ps ON s.idServizio = ps.idServizio
+             WHERE ps.idPacchetto = :idPacchetto"
+        );
+        $stmp->execute(['idPacchetto' => $idPacchetto]);
+        return $stmp->fetchAll();
     }
-
+    /*
     public function create(array $servizio): array
     {
         $newId = end($this->servizi)['idServizio'] + 1;

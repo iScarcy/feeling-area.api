@@ -19,10 +19,10 @@ final class ServiziController
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getById(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
+    public function getByIdPacchetto(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
     {
         $id = (int)$args['id'];
-        $data = $this->service->getById($id);
+        $data = $this->service->getByIdPacchetto($id);
 
         if (!$data) {
             $response->getBody()->write(json_encode(['error' => 'Servizio non trovato'], JSON_UNESCAPED_UNICODE));
@@ -33,6 +33,7 @@ final class ServiziController
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    /*
     public function create(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $input = json_decode((string)$request->getBody(), true);
@@ -56,4 +57,5 @@ final class ServiziController
         $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));
         return $response->withHeader('Content-Type', 'application/json');
     }
+        */
 }
