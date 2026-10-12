@@ -1,9 +1,6 @@
 <?php
 declare(strict_types=1);
-
-use Api\Controllers\ServiziController;
-use Api\Services\ServiziService;
-use Api\Repositories\ServiziRepository;
+ 
 
 use Api\Controllers\UtentiController;
 use Api\Services\UtentiService;
@@ -18,8 +15,7 @@ use Api\Services\AdminService;
 use Api\Repositories\AdminRepository;
 
 use Api\Middleware\JwtMiddleware;
-
-use PDO;
+ 
 
 $dbSettings = require __DIR__ . '/database.php';
 
@@ -70,20 +66,7 @@ return [
     QuestionariController::class => DI\create()
         ->constructor(DI\get(QuestionariService::class)),    
 
-    /*
-    |--------------------------------------------------------------------------
-    | SERVIZI
-    |--------------------------------------------------------------------------
-    */
-
-    ServiziRepository::class => DI\create()
-        ->constructor(DI\get(PDO::class)),
-
-    ServiziService::class => DI\create()
-        ->constructor(DI\get(ServiziRepository::class)),
-
-    ServiziController::class => DI\create()
-        ->constructor(DI\get(ServiziService::class)),
+    
     
     /*
     |--------------------------------------------------------------------------
