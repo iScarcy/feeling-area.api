@@ -4,3 +4,4 @@ api/vendor/
 api/src/Repositories/sql/
 api/createAdmin.php
 .vscode/launch.json
+.vscode

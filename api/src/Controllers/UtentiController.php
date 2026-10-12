@@ -44,22 +44,7 @@ final class UtentiController
             return $this->json($response->withStatus(401), ['error' => $e->getMessage()]);
         }
     }
-    /*
-    public function questionari(ServerRequestInterface $request, ResponseInterface $response, array $args): ResponseInterface
-    {
-        try {
-            $id = (int)($args['id'] ?? 0);
-            if ($id <= 0) {
-                return $this->json($response->withStatus(422), ['error' => 'ID utente non valido']);
-            }
 
-            $questionari = $this->service->getQuestionariByUtenteId($id);
-            return $this->json($response, $questionari);
-        } catch (\Throwable $e) {
-            return $this->json($response->withStatus(400), ['error' => $e->getMessage()]);
-        }
-    }
-    */
     private function json(ResponseInterface $response, mixed $data): ResponseInterface
     {
         $response->getBody()->write(json_encode($data, JSON_UNESCAPED_UNICODE));

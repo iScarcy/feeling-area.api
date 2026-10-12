@@ -60,16 +60,7 @@ $app->group('/utenti', function ($group) {
     $group->post('', [UtentiController::class, 'create']);
     $group->put('/{id}', [UtentiController::class, 'update']);
     $group->delete('/{id}', [UtentiController::class, 'delete']);
-    $group->get('/{id}/questionari', [UtentiController::class, 'questionari']);
     
-})->add($jwtMiddleware);
-
-$app->group('/servizi', function ($group) {
-    $group->get('', [ServiziController::class, 'getAll']);
-    $group->get('/{id}', [ServiziController::class, 'getById']);
-    $group->get('/pacchetti/{id}', [ServiziController::class, 'getByIdPacchetto']);
-    $group->post('', [ServiziController::class, 'create']);
-    $group->put('/{id}', [ServiziController::class, 'update']);
 })->add($jwtMiddleware);
 
 
@@ -79,14 +70,7 @@ $app->group('/questionari', function ($group) {
     $group->get('/{id}', [QuestionariController::class, 'getById']);
 })->add($jwtMiddleware);
 
-$app->group('/pacchetti', function ($group) {
-    $group->get('', [PacchettiController::class, 'getAll']);
-    /*
-    $group->get('/{id}', [PacchettiController::class, 'getById']);
-    $group->post('/{id}/add-servizio', [PacchettiController::class, 'addServizio']);
-    $group->post('/{id}/remove-servizio', [PacchettiController::class, 'removeServizio']);
-    */
-})->add($jwtMiddleware);
+
 
 // Auth NON protetto
 $app->post('/auth/admin', [AdminController::class, 'loginAdmin']);

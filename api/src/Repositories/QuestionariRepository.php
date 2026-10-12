@@ -12,7 +12,7 @@ final class QuestionariRepository
     public function getAll(): array
     {
         $stmt = $this->db->query(
-            "SELECT idQuest, Nome, Descrizione, Attivo FROM `Questionari` ORDER BY Nome"
+            "SELECT idQuest, Nome, Descrizione, NumeroRisposte, Attivo FROM `Questionari` ORDER BY Nome"
         ); 
 
         return $stmt->fetchAll();

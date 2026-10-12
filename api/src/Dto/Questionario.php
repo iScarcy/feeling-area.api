@@ -9,6 +9,7 @@ final class Questionario
         public int $ID,
         public string $Nome,
         public string $Descrizione,
+        public int $NumeroRisposte,
         public array $Domande = [],
         public array $Risultati = []
     ) {}
