@@ -75,6 +75,7 @@ public function login(string $email, string $password): array
     ];
 }
 
+/*
 public function getQuestionariByUtenteId(int $utenteId): array
 {
      
@@ -84,6 +85,6 @@ public function getQuestionariByUtenteId(int $utenteId): array
     
     return $questionari; 
 }
-
+*/
 
 }

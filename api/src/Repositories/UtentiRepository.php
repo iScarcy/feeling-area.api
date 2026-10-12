@@ -33,6 +33,7 @@ class UtentiRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     
+    /*
     public function getQuestionariByUtenteId(int $utenteId): array
     {
         $stmt = $this->pdo->prepare("
@@ -58,7 +59,7 @@ class UtentiRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
+    */
     public function findByEmail(string $email): ?Utente
     {
         $stmt = $this->pdo->prepare("

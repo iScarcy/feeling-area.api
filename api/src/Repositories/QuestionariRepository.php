@@ -12,7 +12,7 @@ final class QuestionariRepository
     public function getAll(): array
     {
         $stmt = $this->db->query(
-            "SELECT idQuest, Nome, Tipo, Descrizione,Domande_Max, Attivo FROM `Questionari` ORDER BY Nome"
+            "SELECT idQuest, Nome, Descrizione, Attivo FROM `Questionari` ORDER BY Nome"
         ); 
 
         return $stmt->fetchAll();
@@ -21,7 +21,7 @@ final class QuestionariRepository
     public function getById(int $id): ?array
     {
         $stmt = $this->db->prepare(
-            "SELECT idQuest, Nome, Tipo, Descrizione,Domande_Max, Attivo FROM `Questionari` WHERE idQuest = :id"
+            "SELECT idQuest, Nome, Descrizione, Attivo FROM `Questionari` WHERE idQuest = :id"
         );
         $stmt->execute(['id' => $id]);
         return $stmt->fetch();
@@ -70,31 +70,27 @@ final class QuestionariRepository
         return (int)$this->db->lastInsertId();
     }   
 
-    public function createQuestionario(string $nome, string $descrizione, string $tipo, int $domandeMax): int
+    public function createQuestionario(string $nome, string $descrizione): int
     {
         $stmt = $this->db->prepare(
-            "INSERT INTO `Questionari` (Nome, Descrizione, Tipo, Domande_Max) VALUES (:nome, :descrizione, :tipo, :domandeMax)"
+            "INSERT INTO `Questionari` (Nome, Descrizione) VALUES (:nome, :descrizione)"
         );
         $stmt->execute([
             'nome' => $nome,
-            'descrizione' => $descrizione,
-            'tipo' => $tipo,
-            'domandeMax' => $domandeMax
+            'descrizione' => $descrizione
         ]);
         return (int)$this->db->lastInsertId();
     }
 
-    public function updateQuestionario(int $id, string $nome, string $descrizione, string $tipo, int $domandeMax): void
+    public function updateQuestionario(int $id, string $nome, string $descrizione): void
     {
         $stmt = $this->db->prepare(
-            "UPDATE `Questionari` SET Nome = :nome, Descrizione = :descrizione, Tipo = :tipo,  Domande_Max = :domandeMax WHERE idQuest = :id"
+            "UPDATE `Questionari` SET Nome = :nome, Descrizione = :descrizione WHERE idQuest = :id"
         );
         $stmt->execute([
             'id' => $id,
             'nome' => $nome,
-            'descrizione' => $descrizione,
-            'tipo' => $tipo,
-            'domandeMax' => $domandeMax
+            'descrizione' => $descrizione
         ]);
     }
 
